@@ -1,6 +1,6 @@
+// src/components/common/Footer.js
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   Box,
   Container,
@@ -8,105 +8,170 @@ import {
   Typography,
   Link,
   Divider,
-  Stack,
-  IconButton
+  IconButton,
+  useTheme,
 } from '@mui/material';
 import {
-  Facebook as FacebookIcon,
-  Twitter as TwitterIcon,
-  Instagram as InstagramIcon,
-  YouTube as YouTubeIcon
+  Facebook,
+  Twitter,
+  Instagram,
+  YouTube,
+  LocationOn,
+  Phone,
+  Email,
 } from '@mui/icons-material';
+import logo from '../../assets/logo.png'; // يجب إضافة شعار للتطبيق
 
 const Footer = () => {
-  const { t } = useTranslation();
-  
+  const theme = useTheme();
   const currentYear = new Date().getFullYear();
   
   return (
     <Box
       component="footer"
       sx={{
-        py: 3,
+        py: 6,
         px: 2,
         mt: 'auto',
-        backgroundColor: theme => theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800]
+        backgroundColor: (theme) => theme.palette.grey[100],
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* Company info */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" color="text.primary" gutterBottom>
-              {t('app.name')}
+        <Grid container spacing={4} justifyContent="space-between">
+          {/* معلومات العلامة التجارية */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Box display="flex" alignItems="center" mb={2}>
+              <img src={logo} alt="تَرزي" style={{ height: '40px', marginLeft: '8px' }} />
+              <Typography variant="h6" color="text.primary" fontWeight="bold">
+                تَرزي
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              منصة تَرزي تقدم خدمات الخياطة المخصصة وبيع الملابس العصرية بأعلى معايير الجودة والتصميم.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('footer.description')}
-            </Typography>
-            <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-              <IconButton color="primary" aria-label="facebook">
-                <FacebookIcon />
+            
+            <Box sx={{ mt: 2 }}>
+              <IconButton
+                aria-label="facebook"
+                color="primary"
+                href="https://facebook.com"
+                target="_blank"
+              >
+                <Facebook />
               </IconButton>
-              <IconButton color="primary" aria-label="twitter">
-                <TwitterIcon />
+              <IconButton
+                aria-label="twitter"
+                color="primary"
+                href="https://twitter.com"
+                target="_blank"
+              >
+                <Twitter />
               </IconButton>
-              <IconButton color="primary" aria-label="instagram">
-                <InstagramIcon />
+              <IconButton
+                aria-label="instagram"
+                color="primary"
+                href="https://instagram.com"
+                target="_blank"
+              >
+                <Instagram />
               </IconButton>
-              <IconButton color="primary" aria-label="youtube">
-                <YouTubeIcon />
+              <IconButton
+                aria-label="youtube"
+                color="primary"
+                href="https://youtube.com"
+                target="_blank"
+              >
+                <YouTube />
               </IconButton>
-            </Stack>
+            </Box>
           </Grid>
           
-          {/* Quick links */}
-          <Grid item xs={12} sm={6} md={4}>
+          {/* روابط سريعة */}
+          <Grid item xs={12} sm={6} md={3}>
             <Typography variant="h6" color="text.primary" gutterBottom>
-              {t('footer.quickLinks')}
+              روابط سريعة
             </Typography>
-            <Box component="ul" sx={{ m: 0, pl: 0, listStyle: 'none' }}>
-              <Box component="li" sx={{ mb: 1 }}>
-                <Link component={RouterLink} to="/products" color="inherit">
-                  {t('nav.products')}
+            <Box component="nav">
+              <Link component={RouterLink} to="/" color="inherit" display="block" mb={1}>
+                الرئيسية
+              </Link>
+              <Link component={RouterLink} to="/products" color="inherit" display="block" mb={1}>
+                المنتجات
+              </Link>
+              <Link component={RouterLink} to="/about" color="inherit" display="block" mb={1}>
+                من نحن
+              </Link>
+              <Link component={RouterLink} to="/contact" color="inherit" display="block" mb={1}>
+                اتصل بنا
+              </Link>
+            </Box>
+          </Grid>
+          
+          {/* معلومات المستخدم */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="h6" color="text.primary" gutterBottom>
+              حسابي
+            </Typography>
+            <Box component="nav">
+              <Link component={RouterLink} to="/login" color="inherit" display="block" mb={1}>
+                تسجيل الدخول
+              </Link>
+              <Link component={RouterLink} to="/register" color="inherit" display="block" mb={1}>
+                إنشاء حساب
+              </Link>
+              <Link component={RouterLink} to="/profile" color="inherit" display="block" mb={1}>
+                الملف الشخصي
+              </Link>
+              <Link component={RouterLink} to="/orders" color="inherit" display="block" mb={1}>
+                طلباتي
+              </Link>
+            </Box>
+          </Grid>
+          
+          {/* معلومات الاتصال */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="h6" color="text.primary" gutterBottom>
+              تواصل معنا
+            </Typography>
+            <Box>
+              <Box display="flex" alignItems="center" mb={1}>
+                <LocationOn color="primary" sx={{ mr: 1 }} />
+                <Typography variant="body2">
+                  المملكة العربية السعودية، الرياض
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" mb={1}>
+                <Phone color="primary" sx={{ mr: 1 }} />
+                <Link href="tel:+966123456789" color="inherit">
+                  +966 12 345 6789
                 </Link>
               </Box>
-              <Box component="li" sx={{ mb: 1 }}>
-                <Link component={RouterLink} to="/orders" color="inherit">
-                  {t('nav.orders')}
-                </Link>
-              </Box>
-              <Box component="li" sx={{ mb: 1 }}>
-                <Link component={RouterLink} to="/measurements" color="inherit">
-                  {t('nav.measurements')}
+              <Box display="flex" alignItems="center" mb={1}>
+                <Email color="primary" sx={{ mr: 1 }} />
+                <Link href="mailto:info@tarzi-app.com" color="inherit">
+                  info@tarzi-app.com
                 </Link>
               </Box>
             </Box>
           </Grid>
-          
-          {/* Contact info */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" color="text.primary" gutterBottom>
-              {t('footer.contactUs')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              {t('footer.address')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('footer.email')}: <Link href="mailto:info@tarzi-app.com" color="inherit">info@tarzi-app.com</Link>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('footer.phone')}: <Link href="tel:+1234567890" color="inherit">+1 (234) 567-890</Link>
-            </Typography>
-          </Grid>
         </Grid>
         
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 4 }} />
         
-        {/* Copyright */}
-        <Box sx={{ textAlign: 'center' }}>
+        {/* حقوق النشر */}
+        <Box textAlign="center">
           <Typography variant="body2" color="text.secondary">
-            © {currentYear} {t('app.name')}. {t('footer.copyright')}
+            &copy; {currentYear} تَرزي - جميع الحقوق محفوظة
           </Typography>
+          <Box mt={1}>
+            <Link component={RouterLink} to="/privacy-policy" color="inherit" sx={{ mx: 1 }}>
+              سياسة الخصوصية
+            </Link>
+            |
+            <Link component={RouterLink} to="/terms-of-service" color="inherit" sx={{ mx: 1 }}>
+              شروط الخدمة
+            </Link>
+          </Box>
         </Box>
       </Container>
     </Box>

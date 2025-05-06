@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+// src/components/common/Header.js
+import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   AppBar,
   Box,
@@ -12,96 +12,148 @@ import {
   Container,
   Avatar,
   Button,
-  Tooltip,
   MenuItem,
   Badge,
   Drawer,
   List,
   ListItem,
-  ListItemIcon,
+  ListItemButton,
   ListItemText,
-  Divider
+  Divider,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  ShoppingCart as CartIcon,
-  Person as PersonIcon,
-  Logout as LogoutIcon,
-  Dashboard as DashboardIcon,
-  Inventory as ProductsIcon,
-  ChevronLeft as ChevronLeftIcon,
-  Language as LanguageIcon
+  AccountCircle,
+  ShoppingCart,
+  Person,
+  Logout,
+  Login,
+  Dashboard,
 } from '@mui/icons-material';
-import { logout } from '../../store/actions/authActions';
+import AuthService from '../../services/AuthService';
+import logo from '../../assets/logo.png'; // يجب إضافة شعار للتطبيق
 
 const Header = () => {
-  const { t, i18n } = useTranslation();
-  const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useSelector(state => state.auth);
-  const { items } = useSelector(state => state.cart || { items: [] });
+  const dispatch = useDispatch();
   
-  // State for dropdowns and mobile menu
+  const { userInfo } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
+  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElLang, setAnchorElLang] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   
-  // Check if user is admin - تصحيح طريقة التحقق
-  const isAdmin = Boolean(user && (user.role === 'admin' || user.role === 'Admin' || user.role === 'ADMIN'));
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
   
-  // DEVELOPMENT: Log user info for debugging
-  useEffect(() => {
-    console.log('Header - Auth state:', { isAuthenticated, user });
-    console.log('User role:', user?.role);
-    console.log('Is admin check:', isAdmin);
-  }, [isAuthenticated, user, isAdmin]);
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
   
-  // Handle user menu
-  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
-  const handleCloseUserMenu = () => setAnchorElUser(null);
+  const handleToggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
   
-  // Handle language menu
-  const handleOpenLangMenu = (event) => setAnchorElLang(event.currentTarget);
-  const handleCloseLangMenu = () => setAnchorElLang(null);
-  
-  // Handle drawer
-  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-  
-  // Handle logout
   const handleLogout = () => {
-    dispatch(logout());
+    AuthService.logout();
+    // تحديث حالة المستخدم في Redux (يفترض وجود إجراء logout في متجر Redux)
+    // dispatch(logout());
     handleCloseUserMenu();
+    navigate('/login');
   };
   
-  // Handle navigation to dashboard directly
-  const goToDashboard = () => {
-    navigate('/admin/dashboard');
-    handleCloseUserMenu();
-  };
+  const cartItemsCount = cartItems?.length || 0;
   
-  // Handle language change
-  const changeLanguage = (lang) => {
-    i18n.changeLanguage(lang);
-    handleCloseLangMenu();
-  };
+  const mainMenuItems = [
+    { text: 'الرئيسية', path: '/' },
+    { text: 'المنتجات', path: '/products' },
+    // يمكن إضافة المزيد من عناصر القائمة هنا
+  ];
+  
+  const renderMobileDrawer = (
+    <Drawer
+      anchor="right"
+      open={mobileMenuOpen}
+      onClose={handleToggleMobileMenu}
+    >
+      <Box
+        sx={{ width: 250 }}
+        role="presentation"
+        onClick={handleToggleMobileMenu}
+      >
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+          <RouterLink to="/" style={{ textDecoration: 'none' }}>
+            <img src={logo} alt="تَرزي" style={{ height: '50px' }} />
+          </RouterLink>
+        </Box>
+        <Divider />
+        <List>
+          {mainMenuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton component={RouterLink} to={item.path}>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {userInfo ? (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton component={RouterLink} to="/profile">
+                  <Person sx={{ mr: 1 }} /> <ListItemText primary="الملف الشخصي" />
+                </ListItemButton>
+              </ListItem>
+              {userInfo.role === 'admin' && (
+                <ListItem disablePadding>
+                  <ListItemButton component={RouterLink} to="/admin/dashboard">
+                    <Dashboard sx={{ mr: 1 }} /> <ListItemText primary="لوحة التحكم" />
+                  </ListItemButton>
+                </ListItem>
+              )}
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleLogout}>
+                  <Logout sx={{ mr: 1 }} /> <ListItemText primary="تسجيل خروج" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          ) : (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton component={RouterLink} to="/login">
+                  <Login sx={{ mr: 1 }} /> <ListItemText primary="تسجيل دخول" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton component={RouterLink} to="/register">
+                  <Person sx={{ mr: 1 }} /> <ListItemText primary="إنشاء حساب" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          )}
+        </List>
+      </Box>
+    </Drawer>
+  );
   
   return (
-    <AppBar position="static" color="primary">
+    <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: '#fff' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* Mobile menu icon */}
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label={t('common.menu')}
-            sx={{ mr: 2, display: { md: 'none' } }}
-            onClick={toggleDrawer}
-          >
-            <MenuIcon />
-          </IconButton>
+          {/* شعار للشاشات الكبيرة */}
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}>
+            <RouterLink to="/">
+              <img src={logo} alt="تَرزي" style={{ height: '50px' }} />
+            </RouterLink>
+          </Box>
           
-          {/* Logo */}
+          {/* عنوان للشاشات الكبيرة */}
           <Typography
             variant="h6"
             noWrap
@@ -109,259 +161,143 @@ const Header = () => {
             to="/"
             sx={{
               mr: 2,
-              display: { xs: 'flex' },
-              fontFamily: 'Cairo, sans-serif',
+              display: { xs: 'none', md: 'flex' },
               fontWeight: 700,
-              letterSpacing: '.1rem',
               color: 'inherit',
               textDecoration: 'none',
-              flexGrow: { xs: 1, md: 0 }
             }}
           >
-            {t('app.name')}
+            تَرزي
           </Typography>
           
-          {/* Desktop navigation */}
+          {/* قائمة للشاشات الكبيرة */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <Button
-              component={RouterLink}
-              to="/"
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              {t('nav.home')}
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/products"
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              {t('nav.products')}
-            </Button>
-            
-            {/* زر لوحة التحكم للمسؤول مع تصحيح الشرط */}
-            {isAuthenticated && isAdmin && (
+            {mainMenuItems.map((item) => (
               <Button
+                key={item.text}
                 component={RouterLink}
-                to="/admin/dashboard"
-                sx={{ 
-                  my: 2, 
-                  color: 'white', 
-                  display: 'block',
-                  fontWeight: 'bold',
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.2)'
-                  },
-                  mx: 1
-                }}
-                startIcon={<DashboardIcon />}
+                to={item.path}
+                sx={{ my: 2, color: 'text.primary', display: 'block' }}
               >
-                {t('nav.dashboard')}
+                {item.text}
               </Button>
-            )}
+            ))}
           </Box>
           
-          {/* Right side icons */}
-          <Box sx={{ display: 'flex' }}>
-            {/* Cart icon */}
-            <Tooltip title={t('nav.cart')}>
-              <IconButton component={RouterLink} to="/cart" color="inherit">
-                <Badge badgeContent={items?.length || 0} color="secondary">
-                  <CartIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
+          {/* شعار للشاشات الصغيرة */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 1 }}>
+            <RouterLink to="/">
+              <img src={logo} alt="تَرزي" style={{ height: '40px' }} />
+            </RouterLink>
+          </Box>
+          
+          {/* عنوان للشاشات الصغيرة */}
+          <Typography
+            variant="h6"
+            noWrap
+            component={RouterLink}
+            to="/"
+            sx={{
+              flexGrow: 1,
+              display: { xs: 'flex', md: 'none' },
+              fontWeight: 700,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            تَرزي
+          </Typography>
+          
+          {/* سلة التسوق وحساب المستخدم */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton component={RouterLink} to="/cart" color="inherit" sx={{ ml: 1 }}>
+              <Badge badgeContent={cartItemsCount} color="error">
+                <ShoppingCart />
+              </Badge>
+            </IconButton>
             
-            {/* Language selector */}
-            <Tooltip title={t('nav.language')}>
-              <IconButton
-                color="inherit"
-                onClick={handleOpenLangMenu}
-              >
-                <LanguageIcon />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              anchorEl={anchorElLang}
-              open={Boolean(anchorElLang)}
-              onClose={handleCloseLangMenu}
-            >
-              <MenuItem onClick={() => changeLanguage('ar')}>
-                العربية
-              </MenuItem>
-              <MenuItem onClick={() => changeLanguage('en')}>
-                English
-              </MenuItem>
-            </Menu>
-            
-            {/* User menu */}
-            {isAuthenticated ? (
+            {userInfo ? (
               <>
-                <Tooltip title={t('nav.account')}>
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 1 }}>
-                    <Avatar sx={{ bgcolor: isAdmin ? 'secondary.main' : 'primary.main' }}>
-                      {user?.username?.charAt(0)?.toUpperCase() || 'U'}
-                    </Avatar>
-                  </IconButton>
-                </Tooltip>
+                <IconButton onClick={handleOpenUserMenu} sx={{ ml: 1 }}>
+                  <Avatar
+                    alt={userInfo.name}
+                    src={userInfo.avatar}
+                    sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}
+                  >
+                    {userInfo.name?.charAt(0)}
+                  </Avatar>
+                </IconButton>
+                
                 <Menu
+                  sx={{ mt: '45px' }}
+                  id="menu-appbar"
                   anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
                   <MenuItem component={RouterLink} to="/profile" onClick={handleCloseUserMenu}>
-                    <ListItemIcon>
-                      <PersonIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={t('nav.profile')} />
+                    <Person sx={{ mr: 1 }} /> الملف الشخصي
                   </MenuItem>
                   
-                  <MenuItem component={RouterLink} to="/orders" onClick={handleCloseUserMenu}>
-                    <ListItemIcon>
-                      <ProductsIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={t('nav.orders')} />
-                  </MenuItem>
-                  
-                  {/* رابط لوحة التحكم للمسؤولين مع تصحيح الشرط */}
-                  {isAdmin && (
-                    <MenuItem 
-                      onClick={goToDashboard}
-                      sx={{
-                        bgcolor: 'primary.light',
-                        '&:hover': {
-                          bgcolor: 'primary.dark',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      <ListItemIcon>
-                        <DashboardIcon fontSize="small" color="primary" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={t('nav.dashboard')} 
-                        primaryTypographyProps={{ fontWeight: 'bold' }}
-                      />
+                  {userInfo.role === 'admin' && (
+                    <MenuItem component={RouterLink} to="/admin/dashboard" onClick={handleCloseUserMenu}>
+                      <Dashboard sx={{ mr: 1 }} /> لوحة التحكم
                     </MenuItem>
                   )}
                   
-                  <Divider />
-                  
                   <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={t('auth.logout')} />
+                    <Logout sx={{ mr: 1 }} /> تسجيل خروج
                   </MenuItem>
                 </Menu>
               </>
             ) : (
-              <Button
-                component={RouterLink}
-                to="/login"
-                color="inherit"
+              <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                <Button
+                  component={RouterLink}
+                  to="/login"
+                  color="inherit"
+                  sx={{ ml: 1 }}
+                >
+                  تسجيل دخول
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/register"
+                  variant="contained"
+                  color="primary"
+                >
+                  إنشاء حساب
+                </Button>
+              </Box>
+            )}
+            
+            {/* زر القائمة للشاشات الصغيرة */}
+            {isMobile && (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="menu"
+                onClick={handleToggleMobileMenu}
+                sx={{ mr: 1 }}
               >
-                {t('auth.login')}
-              </Button>
+                <MenuIcon />
+              </IconButton>
             )}
           </Box>
         </Toolbar>
       </Container>
       
-      {/* Mobile drawer */}
-      <Drawer
-        anchor={i18n.language === 'ar' ? 'right' : 'left'}
-        open={drawerOpen}
-        onClose={toggleDrawer}
-      >
-        <Box
-          sx={{ width: 250 }}
-          role="presentation"
-          onClick={toggleDrawer}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              p: 2
-            }}
-          >
-            <Typography variant="h6">{t('app.name')}</Typography>
-            <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Box>
-          
-          <Divider />
-          
-          <List>
-            <ListItem button component={RouterLink} to="/">
-              <ListItemText primary={t('nav.home')} />
-            </ListItem>
-            
-            <ListItem button component={RouterLink} to="/products">
-              <ListItemText primary={t('nav.products')} />
-            </ListItem>
-            
-            {/* لوحة التحكم في القائمة الجانبية للمسؤول مع تصحيح الشرط */}
-            {isAuthenticated && isAdmin && (
-              <ListItem 
-                button 
-                component={RouterLink} 
-                to="/admin/dashboard"
-                sx={{
-                  bgcolor: 'primary.light',
-                  '&:hover': {
-                    bgcolor: 'primary.dark',
-                    color: 'white'
-                  }
-                }}
-              >
-                <ListItemIcon>
-                  <DashboardIcon fontSize="small" color="primary" />
-                </ListItemIcon>
-                <ListItemText 
-                  primary={t('nav.dashboard')} 
-                  primaryTypographyProps={{ fontWeight: 'bold' }}
-                />
-              </ListItem>
-            )}
-            
-            {isAuthenticated ? (
-              <>
-                <ListItem button component={RouterLink} to="/profile">
-                  <ListItemText primary={t('nav.profile')} />
-                </ListItem>
-                
-                <ListItem button component={RouterLink} to="/orders">
-                  <ListItemText primary={t('nav.orders')} />
-                </ListItem>
-                
-                <ListItem button component={RouterLink} to="/measurements">
-                  <ListItemText primary={t('nav.measurements')} />
-                </ListItem>
-                
-                <Divider />
-                
-                <ListItem button onClick={handleLogout}>
-                  <ListItemText primary={t('auth.logout')} />
-                </ListItem>
-              </>
-            ) : (
-              <>
-                <ListItem button component={RouterLink} to="/login">
-                  <ListItemText primary={t('auth.login')} />
-                </ListItem>
-                
-                <ListItem button component={RouterLink} to="/register">
-                  <ListItemText primary={t('auth.register')} />
-                </ListItem>
-              </>
-            )}
-          </List>
-        </Box>
-      </Drawer>
+      {/* قائمة الشاشات الصغيرة */}
+      {renderMobileDrawer}
     </AppBar>
   );
 };

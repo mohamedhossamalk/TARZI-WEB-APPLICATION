@@ -1,60 +1,56 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+// الصفحات الرئيسية
 import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProfilePage from './pages/ProfilePage';
-import OrdersPage from './pages/OrdersPage';
-import MeasurementsPage from './pages/MeasurementsPage';
-import NotFoundPage from './pages/NotFoundPage';
-import DashboardPage from './pages/admin/DashboardPage';
-import UsersPage from './pages/admin/UsersPage';
-import AdminProductsPage from './pages/admin/AdminProductsPage';
-import AdminOrdersPage from './pages/admin/AdminOrdersPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
-// Protected route component
-const ProtectedRoute = ({ children, roles = [] }) => {
-  const { isAuthenticated, user } = useSelector(state => state.auth);
+// صفحات المصادقة
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+
+// صفحة لوحة التحكم الرئيسية
+import Dashboard from './pages/admin/DashboardPage';
+
+// التخطيطات
+import MainLayout from './layouts/MainLayout';
+import AdminLayout from './layouts/AdminLayout';
+import AuthLayout from './layouts/AuthLayout';
+import ErrorPage from './pages/ErrorPage';
+
+// مكون المسار المحمي للمستخدم العادي
+const ProtectedRoute = ({ children }) => {
+  const { userInfo } = useSelector((state) => state.auth);
   const location = useLocation();
   
-  console.log('ProtectedRoute check:', { isAuthenticated, user, roles });
-  
-  if (!isAuthenticated) {
-    // حفظ مسار التوجيه المطلوب للعودة إليه بعد تسجيل الدخول
-    return <Navigate to="/login" state={{ from: location }} />;
+  if (!userInfo) {
+    // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول إذا لم يكن مصادقًا
+    return <Navigate to="/login" state={{ from: location.pathname }} />;
   }
   
-  // للتطوير: إذا كان دور المستخدم غير محدد، افترض أنه مسؤول
-  const userRole = user?.role || 'admin';
-  
-  // إذا كان المستخدم مصادق عليه وليس هناك أدوار مطلوبة أو مسموح بدور المستخدم
-  if (roles.length === 0 || roles.includes(userRole)) {
-    return children;
-  }
-  
-  // المستخدم ليس لديه صلاحية
-  return <Navigate to="/" />;
+  return children;
 };
 
-// Admin route wrapper
+// مكون المسار المحمي للمسؤول
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user } = useSelector(state => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
+  const location = useLocation();
   
-  console.log('AdminRoute check:', { isAuthenticated, user });
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+  if (!userInfo) {
+    // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول إذا لم يكن مصادقًا
+    return <Navigate to="/login" state={{ from: location.pathname }} />;
   }
   
-  // للتطوير: افترض دائمًا أن المستخدم مسؤول إذا لم يكن له دور محدد
-  const userRole = user?.role || 'admin';
-  
-  if (userRole !== 'admin') {
+  if (userInfo.role !== 'admin' && userInfo.role !== 'superadmin') {
+    // إعادة توجيه المستخدم إلى الصفحة الرئيسية إذا لم يكن مسؤولًا
     return <Navigate to="/" />;
   }
   
@@ -64,89 +60,65 @@ const AdminRoute = ({ children }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/products" element={<ProductsPage />} />
-      <Route path="/products/:id" element={<ProductDetailPage />} />
-      <Route path="/cart" element={<CartPage />} />
-      
-      {/* Protected routes */}
-      <Route 
-        path="/checkout" 
-        element={
-          <ProtectedRoute>
-            <CheckoutPage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      <Route 
-        path="/profile" 
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      <Route 
-        path="/orders" 
-        element={
-          <ProtectedRoute>
-            <OrdersPage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      <Route 
-        path="/measurements" 
-        element={
-          <ProtectedRoute>
-            <MeasurementsPage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      {/* Admin routes */}
-      <Route 
-        path="/admin/dashboard" 
+      {/* مسارات واجهة المستخدم */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
+
+        {/* مسارات المستخدم المسجل */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <OrderHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      {/* مسارات المصادقة */}
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      </Route>
+
+      {/* مسار لوحة تحكم المسؤول */}
+      <Route
+        path="/admin"
         element={
           <AdminRoute>
-            <DashboardPage />
+            <AdminLayout />
           </AdminRoute>
-        } 
-      />
-      
-      <Route 
-        path="/admin/users" 
-        element={
-          <AdminRoute>
-            <UsersPage />
-          </AdminRoute>
-        } 
-      />
-      
-      <Route 
-        path="/admin/products" 
-        element={
-          <AdminRoute>
-            <AdminProductsPage />
-          </AdminRoute>
-        } 
-      />
-      
-      <Route 
-        path="/admin/orders" 
-        element={
-          <AdminRoute>
-            <AdminOrdersPage />
-          </AdminRoute>
-        } 
-      />
-      
-      {/* 404 page */}
-      <Route path="*" element={<NotFoundPage />} />
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        
+        {/* مسارات أخرى للوحة التحكم يمكنك إضافتها لاحقاً */}
+      </Route>
+
+      {/* مسار غير موجود */}
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 };

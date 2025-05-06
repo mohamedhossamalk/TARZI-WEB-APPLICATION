@@ -1,34 +1,35 @@
+// models/ActivityLog.js
 const mongoose = require('mongoose');
 
 const activityLogSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   action: {
     type: String,
-    required: [true, 'يرجى توفير وصف للإجراء']
+    required: true,
+    enum: ['create', 'update', 'delete', 'login', 'logout', 'other']
   },
   entity: {
     type: String,
-    required: [true, 'يرجى توفير نوع الكيان'],
-    enum: ['user', 'product', 'order', 'measurement', 'service', 'category', 'system']
+    required: true
   },
   entityId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: false
   },
   details: {
-    type: mongoose.Schema.Types.Mixed,  // تم تصحيح هذا السطر
-    default: {}
+    type: String,
+    required: false
   },
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  ipAddress: String,
-  userAgent: String
-});
+  ip: {
+    type: String,
+    required: false
+  }
+}, { timestamps: true });
 
-module.exports = mongoose.model('ActivityLog', activityLogSchema);
+const ActivityLog = mongoose.model('ActivityLog', activityLogSchema);
+
+module.exports = ActivityLog;
