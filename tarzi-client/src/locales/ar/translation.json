@@ -1,0 +1,206 @@
+{
+  "app": {
+    "name": "الترزي أونلاين"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "cart": "السلة",
+    "profile": "الملف الشخصي",
+    "orders": "طلباتي",
+    "dashboard": "لوحة التحكم",
+    "measurements": "قياساتي",
+    "language": "اللغة",
+    "account": "الحساب"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "username": "اسم المستخدم",
+    "phone": "رقم الهاتف",
+    "loginBtn": "دخول",
+    "registerBtn": "تسجيل",
+    "logout": "تسجيل الخروج",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟ سجل الآن",
+    "haveAccount": "لديك حساب بالفعل؟ سجل دخول",
+    "confirmPassword": "تأكيد كلمة المرور"
+  },
+  "home": {
+    "hero": {
+      "title": "خدمات خياطة متميزة",
+      "subtitle": "أفضل خياطين محترفين بخدمتك لتفصيل أزيائك المفضلة وإجراء التعديلات بأعلى جودة",
+      "cta": "تسوق الآن"
+    },
+    "featuredProducts": {
+      "title": "منتجات مميزة",
+      "subtitle": "اكتشف مجموعتنا المميزة من أحدث تصاميم الأزياء",
+      "viewAll": "عرض جميع المنتجات"
+    },
+    "services": {
+      "title": "خدماتنا",
+      "subtitle": "نقدم مجموعة متكاملة من خدمات الخياطة عالية الجودة",
+      "customTailoring": {
+        "title": "تفصيل خاص",
+        "description": "تفصيل الملابس وفقًا لذوقك وقياساتك الخاصة مع اختيار الأقمشة والتصاميم المميزة"
+      },
+      "alterations": {
+        "title": "تعديلات",
+        "description": "خدمات تعديل وتصليح الملابس بأيدي خبراء لضمان الحصول على المقاس المثالي"
+      },
+      "fabricSelection": {
+        "title": "اختيار الأقمشة",
+        "description": "مجموعة واسعة من الأقمشة عالية الجودة لتختار منها ما يناسب ذوقك واحتياجاتك"
+      }
+    }
+  },
+  "product": {
+    "details": "التفاصيل",
+    "addToCart": "أضف للسلة",
+    "featured": "مميز",
+    "noFeaturedProducts": "لا توجد منتجات مميزة حالياً",
+    "fabric": "القماش",
+    "color": "اللون",
+    "quantity": "الكمية",
+    "addedToCart": "تمت الإضافة إلى السلة",
+    "availableFabrics": "الأقمشة المتاحة",
+    "availableColors": "الألوان المتاحة",
+    "description": "الوصف",
+    "reviews": "التقييمات",
+    "relatedProducts": "منتجات مشابهة",
+    "price": "السعر",
+    "total": "الإجمالي"
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "empty": "السلة فارغة",
+    "continueShopping": "مواصلة التسوق",
+    "checkout": "إتمام الشراء",
+    "summary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "tax": "الضريبة",
+    "total": "الإجمالي",
+    "remove": "إزالة",
+    "updateQuantity": "تحديث الكمية"
+  },
+  "order": {
+    "placeOrder": "تأكيد الطلب",
+    "orderNumber": "رقم الطلب",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "viewDetails": "عرض التفاصيل",
+    "orderDetails": "تفاصيل الطلب",
+    "shippingAddress": "عنوان الشحن",
+    "paymentMethod": "طريقة الدفع",
+    "items": "المنتجات",
+    "noOrders": "لا توجد طلبات",
+    "cancel": "إلغاء الطلب",
+    "pending": "قيد الانتظار",
+    "processing": "قيد التصنيع",
+    "shipped": "تم الشحن",
+    "delivered": "تم التسليم",
+    "cancelled": "ملغي",
+    "additionalRequests": "طلبات إضافية",
+    "measurements": "القياسات"
+  },
+  "measurement": {
+    "title": "قياساتي",
+    "addNew": "إضافة قياسات جديدة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "name": "اسم القياس",
+    "chest": "الصدر",
+    "waist": "الخصر",
+    "hips": "الأرداف",
+    "shoulder": "الكتف",
+    "sleeve": "الكم",
+    "inseam": "طول الساق الداخلي",
+    "neck": "الرقبة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "cm": "سم",
+    "noMeasurements": "لا توجد قياسات محفوظة"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "addressBook": "دفتر العناوين",
+    "passwordChange": "تغيير كلمة المرور",
+    "save": "حفظ التغييرات",
+    "address": "العنوان",
+    "city": "المدينة",
+    "state": "المحافظة/الولاية",
+    "zip": "الرمز البريدي",
+    "country": "الدولة",
+    "addAddress": "إضافة عنوان",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة"
+  },
+  "admin": {
+    "dashboard": "لوحة التحكم",
+    "products": "المنتجات",
+    "users": "المستخدمون",
+    "orders": "الطلبات",
+    "addProduct": "إضافة منتج جديد",
+    "editProduct": "تعديل المنتج",
+    "deleteProduct": "حذف المنتج",
+    "userManagement": "إدارة المستخدمين",
+    "statistics": "الإحصائيات",
+    "salesThisMonth": "مبيعات هذا الشهر",
+    "totalProducts": "إجمالي المنتجات",
+    "totalUsers": "إجمالي المستخدمين",
+    "pendingOrders": "الطلبات قيد الانتظار"
+  },
+  "footer": {
+    "quickLinks": "روابط سريعة",
+    "contactUs": "اتصل بنا",
+    "address": "123 شارع الخياطة، المدينة، الدولة",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "copyright": "جميع الحقوق محفوظة",
+    "description": "منصة الترزي أونلاين هي وجهتك المثالية لخدمات الخياطة عالية الجودة، اختر من بين تشكيلتنا الواسعة واستمتع بتجربة تفصيل فريدة"
+  },
+  "validation": {
+    "email": {
+      "required": "البريد الإلكتروني مطلوب",
+      "invalid": "بريد إلكتروني غير صالح"
+    },
+    "password": {
+      "required": "كلمة المرور مطلوبة",
+      "min": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل"
+    },
+    "username": {
+      "required": "اسم المستخدم مطلوب",
+      "min": "اسم المستخدم يجب أن يحتوي على 3 أحرف على الأقل"
+    },
+    "phone": {
+      "required": "رقم الهاتف مطلوب",
+      "matches": "رقم الهاتف يجب أن يحتوي على أرقام فقط"
+    },
+    "confirmPassword": {
+      "match": "كلمات المرور غير متطابقة",
+      "required": "تأكيد كلمة المرور مطلوب"
+    }
+  },
+  "common": {
+    "menu": "القائمة",
+    "currency": "ج.م",
+    "loading": "جارِ التحميل...",
+    "error": "حدث خطأ",
+    "success": "تمت العملية بنجاح",
+    "yes": "نعم",
+    "no": "لا",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "search": "بحث"
+  }
+}
