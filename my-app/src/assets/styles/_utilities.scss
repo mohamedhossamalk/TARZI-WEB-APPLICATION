@@ -1,0 +1,183 @@
+// فئات هامش وحشو
+@each $prop, $abbrev in (margin: m, padding: p) {
+  @each $size, $value in $spacers {
+    // كل الجوانب
+    .#{$abbrev}-#{$size} {
+      #{$prop}: $value !important;
+    }
+    
+    // الأعلى
+    .#{$abbrev}t-#{$size} {
+      #{$prop}-top: $value !important;
+    }
+    
+    // الأسفل
+    .#{$abbrev}b-#{$size} {
+      #{$prop}-bottom: $value !important;
+    }
+    
+    // اليمين
+    .#{$abbrev}r-#{$size} {
+      #{$prop}-right: $value !important;
+    }
+    
+    // اليسار
+    .#{$abbrev}l-#{$size} {
+      #{$prop}-left: $value !important;
+    }
+    
+    // الأفقي
+    .#{$abbrev}x-#{$size} {
+      #{$prop}-right: $value !important;
+      #{$prop}-left: $value !important;
+    }
+    
+    // الرأسي
+    .#{$abbrev}y-#{$size} {
+      #{$prop}-top: $value !important;
+      #{$prop}-bottom: $value !important;
+    }
+  }
+}
+
+// فئات محاذاة النص
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+// فئات العرض
+.d-flex {
+  display: flex !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.d-inline-block {
+  display: inline-block !important;
+}
+
+.d-none {
+  display: none !important;
+}
+
+// فئات flex
+.flex-row {
+  flex-direction: row !important;
+}
+
+.flex-column {
+  flex-direction: column !important;
+}
+
+.justify-content-start {
+  justify-content: flex-start !important;
+}
+
+.justify-content-end {
+  justify-content: flex-end !important;
+}
+
+.justify-content-center {
+  justify-content: center !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.justify-content-around {
+  justify-content: space-around !important;
+}
+
+.align-items-start {
+  align-items: flex-start !important;
+}
+
+.align-items-end {
+  align-items: flex-end !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+// فئات وزن الخط
+.fw-light {
+  font-weight: $font-weight-light !important;
+}
+
+.fw-normal {
+  font-weight: $font-weight-normal !important;
+}
+
+.fw-medium {
+  font-weight: $font-weight-medium !important;
+}
+
+.fw-semibold {
+  font-weight: $font-weight-semibold !important;
+}
+
+.fw-bold {
+  font-weight: $font-weight-bold !important;
+}
+
+// فئات إخفاء مستجيبة
+@each $breakpoint in map-keys($breakpoints) {
+  @include respond-to($breakpoint) {
+    .d-#{$breakpoint}-none {
+      display: none !important;
+    }
+    
+    .d-#{$breakpoint}-block {
+      display: block !important;
+    }
+    
+    .d-#{$breakpoint}-flex {
+      display: flex !important;
+    }
+  }
+}
+
+// فئات لون النص
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-white {
+  color: var(--white) !important;
+}
+
+.text-black {
+  color: var(--black) !important;
+}
+
+.text-success {
+  color: var(--success) !important;
+}
+
+.text-error {
+  color: var(--error) !important;
+}
+
+.text-warning {
+  color: var(--warning) !important;
+}
+
+.text-info {
+  color: var(--info) !important;
+}
