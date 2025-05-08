@@ -1,15 +1,13 @@
 // src/features/orders/routes.js
 import React from 'react';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import OrderTrackingPage from './pages/OrderTrackingPage';
 
-// استيراد مكونات الصفحات مؤقتاً
-const OrdersPage = () => <div>صفحة الطلبات</div>;
-const OrderDetailPage = () => <div>صفحة تفاصيل الطلب</div>;
-const CheckoutPage = () => <div>صفحة الدفع</div>;
-
-export const orderRoutes = [
+const orderRoutes = [
   { path: "/orders", element: <OrdersPage /> },
   { path: "/orders/:id", element: <OrderDetailPage /> },
-  { path: "/checkout", element: <CheckoutPage /> },
+  { path: "/orders/:id/track", element: <OrderTrackingPage /> }
 ];
 
 export default orderRoutes;

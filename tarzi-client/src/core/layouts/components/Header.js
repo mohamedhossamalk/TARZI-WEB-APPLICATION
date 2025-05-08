@@ -85,13 +85,18 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const Header = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
-  const { cartItems } = useCart();
+  const { cart } = useCart(); // تغيير من cartItems إلى cart
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // التعامل بشكل آمن مع عدد العناصر في السلة
+  const cartItemsCount = cart?.items?.length || 0;
+  // إذا كان unreadCount غير معرف، استخدم 0 كقيمة افتراضية
+  const notificationsCount = unreadCount || 0;
   
   const handleMobileMenuOpen = (event) => {
     setMobileMenuAnchorEl(event.currentTarget);
@@ -130,273 +135,273 @@ const Header = () => {
 
   return (
     <AppBar position="sticky">
-    <Container maxWidth="xl">
-      <Toolbar disableGutters>
-        {/* شعار للجوال */}
-        <Typography
-          variant="h6"
-          noWrap
-          component={RouterLink}
-          to="/"
-          sx={{
-            mr: 2,
-            display: { xs: 'none', md: 'flex' },
-            fontWeight: 700,
-            color: 'inherit',
-            textDecoration: 'none',
-          }}
-        >
-          تارزي
-        </Typography>
-
-        {/* قائمة الجوال */}
-        <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
-          <IconButton
-            size="large"
-            aria-label="القائمة الرئيسية"
-            aria-controls={mobileMenuId}
-            aria-haspopup="true"
-            onClick={handleMobileMenuOpen}
-            color="inherit"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            id={mobileMenuId}
-            anchorEl={mobileMenuAnchorEl}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
-          >
-            <MenuItem component={RouterLink} to="/" onClick={handleMobileMenuClose}>
-              الرئيسية
-            </MenuItem>
-            <MenuItem component={RouterLink} to="/products" onClick={handleMobileMenuClose}>
-              المنتجات
-            </MenuItem>
-            <MenuItem component={RouterLink} to="/services" onClick={handleMobileMenuClose}>
-              الخدمات المهنية
-            </MenuItem>
-            {isAuthenticated ? (
-              <>
-                <MenuItem component={RouterLink} to="/orders" onClick={handleMobileMenuClose}>
-                  طلباتي
-                </MenuItem>
-                <MenuItem component={RouterLink} to="/measurements" onClick={handleMobileMenuClose}>
-                  مقاساتي
-                </MenuItem>
-                <MenuItem component={RouterLink} to="/cart" onClick={handleMobileMenuClose}>
-                  سلة التسوق
-                </MenuItem>
-              </>
-            ) : (
-              <>
-                <MenuItem component={RouterLink} to="/login" onClick={handleMobileMenuClose}>
-                  تسجيل الدخول
-                </MenuItem>
-                <MenuItem component={RouterLink} to="/register" onClick={handleMobileMenuClose}>
-                  إنشاء حساب
-                </MenuItem>
-              </>
-            )}
-          </Menu>
-        </Box>
-
-        {/* شعار للموبايل */}
-        <Typography
-          variant="h6"
-          noWrap
-          component={RouterLink}
-          to="/"
-          sx={{
-            mr: 2,
-            display: { xs: 'flex', md: 'none' },
-            flexGrow: 1,
-            fontWeight: 700,
-            color: 'inherit',
-            textDecoration: 'none',
-          }}
-        >
-          تارزي
-        </Typography>
-
-        {/* روابط القائمة */}
-        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-          <Button
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          {/* شعار للجوال */}
+          <Typography
+            variant="h6"
+            noWrap
             component={RouterLink}
             to="/"
-            sx={{ my: 2, color: 'white', display: 'block' }}
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontWeight: 700,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
           >
-            الرئيسية
-          </Button>
-          <Button
+            تارزي
+          </Typography>
+
+          {/* قائمة الجوال */}
+          <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="القائمة الرئيسية"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id={mobileMenuId}
+              anchorEl={mobileMenuAnchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={isMobileMenuOpen}
+              onClose={handleMobileMenuClose}
+            >
+              <MenuItem component={RouterLink} to="/" onClick={handleMobileMenuClose}>
+                الرئيسية
+              </MenuItem>
+              <MenuItem component={RouterLink} to="/products" onClick={handleMobileMenuClose}>
+                المنتجات
+              </MenuItem>
+              <MenuItem component={RouterLink} to="/services" onClick={handleMobileMenuClose}>
+                الخدمات المهنية
+              </MenuItem>
+              {isAuthenticated ? (
+                <>
+                  <MenuItem component={RouterLink} to="/orders" onClick={handleMobileMenuClose}>
+                    طلباتي
+                  </MenuItem>
+                  <MenuItem component={RouterLink} to="/measurements" onClick={handleMobileMenuClose}>
+                    مقاساتي
+                  </MenuItem>
+                  <MenuItem component={RouterLink} to="/cart" onClick={handleMobileMenuClose}>
+                    سلة التسوق
+                  </MenuItem>
+                </>
+              ) : (
+                <>
+                  <MenuItem component={RouterLink} to="/login" onClick={handleMobileMenuClose}>
+                    تسجيل الدخول
+                  </MenuItem>
+                  <MenuItem component={RouterLink} to="/register" onClick={handleMobileMenuClose}>
+                    إنشاء حساب
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
+
+          {/* شعار للموبايل */}
+          <Typography
+            variant="h6"
+            noWrap
             component={RouterLink}
-            to="/products"
-            sx={{ my: 2, color: 'white', display: 'block' }}
+            to="/"
+            sx={{
+              mr: 2,
+              display: { xs: 'flex', md: 'none' },
+              flexGrow: 1,
+              fontWeight: 700,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
           >
-            المنتجات
-          </Button>
-          <Button
-            component={RouterLink}
-            to="/services"
-            sx={{ my: 2, color: 'white', display: 'block' }}
-          >
-            الخدمات المهنية
-          </Button>
-          {isAuthenticated && (
+            تارزي
+          </Typography>
+
+          {/* روابط القائمة */}
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <Button
               component={RouterLink}
-              to="/orders"
+              to="/"
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              طلباتي
+              الرئيسية
             </Button>
-          )}
-          {isAuthenticated && (
             <Button
               component={RouterLink}
-              to="/measurements"
+              to="/products"
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              مقاساتي
+              المنتجات
             </Button>
-          )}
-        </Box>
-
-        {/* البحث */}
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <form onSubmit={handleSearch}>
-            <StyledInputBase
-              placeholder="بحث..."
-              inputProps={{ 'aria-label': 'بحث' }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-        </Search>
-
-        {/* أيقونات وقائمة المستخدم */}
-        <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
-          {isAuthenticated ? (
-            <>
-              {/* سلة التسوق */}
-              <IconButton
+            <Button
+              component={RouterLink}
+              to="/services"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+              الخدمات المهنية
+            </Button>
+            {isAuthenticated && (
+              <Button
                 component={RouterLink}
-                to="/cart"
-                size="large"
-                aria-label="سلة التسوق"
-                color="inherit"
-                sx={{ mx: 1 }}
+                to="/orders"
+                sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <StyledBadge badgeContent={cartItems.length} color="error">
-                  <ShoppingCart />
-                </StyledBadge>
-              </IconButton>
-
-              {/* الإشعارات */}
-              <IconButton
+                طلباتي
+              </Button>
+            )}
+            {isAuthenticated && (
+              <Button
                 component={RouterLink}
-                to="/notifications"
-                size="large"
-                aria-label="الإشعارات"
-                color="inherit"
-                sx={{ mx: 1 }}
+                to="/measurements"
+                sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <StyledBadge badgeContent={unreadCount} color="error">
-                  <Notifications />
-                </StyledBadge>
-              </IconButton>
+                مقاساتي
+              </Button>
+            )}
+          </Box>
 
-              {/* قائمة المستخدم */}
-              <Tooltip title="الإعدادات">
+          {/* البحث */}
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <form onSubmit={handleSearch}>
+              <StyledInputBase
+                placeholder="بحث..."
+                inputProps={{ 'aria-label': 'بحث' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </form>
+          </Search>
+
+          {/* أيقونات وقائمة المستخدم */}
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
+            {isAuthenticated ? (
+              <>
+                {/* سلة التسوق */}
                 <IconButton
-                  onClick={handleUserMenuOpen}
+                  component={RouterLink}
+                  to="/cart"
                   size="large"
-                  edge="end"
-                  aria-label="قائمة المستخدم"
-                  aria-controls={userMenuId}
-                  aria-haspopup="true"
+                  aria-label="سلة التسوق"
                   color="inherit"
                   sx={{ mx: 1 }}
                 >
-                  {user?.imageUrl ? (
-                    <Avatar alt={user.username} src={user.imageUrl} />
-                  ) : (
-                    <AccountCircle />
-                  )}
+                  <StyledBadge badgeContent={cartItemsCount} color="error">
+                    <ShoppingCart />
+                  </StyledBadge>
                 </IconButton>
-              </Tooltip>
-              <Menu
-                id={userMenuId}
-                anchorEl={userMenuAnchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={isUserMenuOpen}
-                onClose={handleUserMenuClose}
-              >
-                <MenuItem component={RouterLink} to="/profile" onClick={handleUserMenuClose}>
-                  <AccountCircle sx={{ mr: 2 }} />
-                  الملف الشخصي
-                </MenuItem>
-                
-                {isAdmin && (
-                  <MenuItem component={RouterLink} to="/admin" onClick={handleUserMenuClose}>
-                    <Dashboard sx={{ mr: 2 }} />
-                    لوحة التحكم
+
+                {/* الإشعارات */}
+                <IconButton
+                  component={RouterLink}
+                  to="/notifications"
+                  size="large"
+                  aria-label="الإشعارات"
+                  color="inherit"
+                  sx={{ mx: 1 }}
+                >
+                  <StyledBadge badgeContent={notificationsCount} color="error">
+                    <Notifications />
+                  </StyledBadge>
+                </IconButton>
+
+                {/* قائمة المستخدم */}
+                <Tooltip title="الإعدادات">
+                  <IconButton
+                    onClick={handleUserMenuOpen}
+                    size="large"
+                    edge="end"
+                    aria-label="قائمة المستخدم"
+                    aria-controls={userMenuId}
+                    aria-haspopup="true"
+                    color="inherit"
+                    sx={{ mx: 1 }}
+                  >
+                    {user?.imageUrl ? (
+                      <Avatar alt={user.username} src={user.imageUrl} />
+                    ) : (
+                      <AccountCircle />
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  id={userMenuId}
+                  anchorEl={userMenuAnchorEl}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  open={isUserMenuOpen}
+                  onClose={handleUserMenuClose}
+                >
+                  <MenuItem component={RouterLink} to="/profile" onClick={handleUserMenuClose}>
+                    <AccountCircle sx={{ mr: 2 }} />
+                    الملف الشخصي
                   </MenuItem>
-                )}
-                
-                <Divider />
-                
-                <MenuItem onClick={handleLogout}>
-                  <Logout sx={{ mr: 2 }} />
-                  تسجيل الخروج
-                </MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <>
-              <Button
-                component={RouterLink}
-                to="/login"
-                color="inherit"
-                sx={{ ml: 1 }}
-              >
-                تسجيل الدخول
-              </Button>
-              <Button
-                component={RouterLink}
-                to="/register"
-                variant="contained"
-                color="secondary"
-              >
-                إنشاء حساب
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
-    </Container>
-  </AppBar>
-);
+                  
+                  {isAdmin && (
+                    <MenuItem component={RouterLink} to="/admin" onClick={handleUserMenuClose}>
+                      <Dashboard sx={{ mr: 2 }} />
+                      لوحة التحكم
+                    </MenuItem>
+                  )}
+                  
+                  <Divider />
+                  
+                  <MenuItem onClick={handleLogout}>
+                    <Logout sx={{ mr: 2 }} />
+                    تسجيل الخروج
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <>
+                <Button
+                  component={RouterLink}
+                  to="/login"
+                  color="inherit"
+                  sx={{ ml: 1 }}
+                >
+                  تسجيل الدخول
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/register"
+                  variant="contained"
+                  color="secondary"
+                >
+                  إنشاء حساب
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
+  );
 };
 
 export default Header;

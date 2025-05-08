@@ -6,23 +6,35 @@ import 'moment/locale/ar';
 // تعيين اللغة العربية
 moment.locale('ar');
 
-// تنسيق العملة
-export const formatCurrency = (amount, currency = CURRENCY) => {
-  return new Intl.NumberFormat('ar-EG', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-};
-
-// تنسيق التاريخ
-export const formatDate = (date, format = DATE_FORMAT) => {
-  return moment(date).format(format);
+//تنسيق التاريخ
+export const formatDate = (dateString, options = {}) => {
+  if (!dateString) return '';
+  
+  const defaultOptions = { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric'
+  };
+  
+  const mergedOptions = { ...defaultOptions, ...options };
+  const date = new Date(dateString);
+  
+  return date.toLocaleDateString('ar-SA', mergedOptions);
 };
 
 // تنسيق وقت نسبي (منذ)
 export const formatRelativeTime = (date) => {
   return moment(date).fromNow();
 };
+
+
+
+// تنسيق العملة
+export const formatCurrency = (amount, currency = 'ر.س') => {
+  if (amount === undefined || amount === null) return '';
+  return `${amount.toLocaleString('ar-SA')}`;
+};
+
 
 // تنسيق النسبة المئوية
 export const formatPercentage = (value) => {

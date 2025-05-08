@@ -1,13 +1,11 @@
 // src/features/admin/routes.js
 import React from 'react';
-
-// استيراد مكونات الصفحات مؤقتاً
-const DashboardPage = () => <div>لوحة التحكم</div>;
-const ProductsAdminPage = () => <div>إدارة المنتجات</div>;
-const CategoriesAdminPage = () => <div>إدارة الفئات</div>;
-const OrdersAdminPage = () => <div>إدارة الطلبات</div>;
-const UsersAdminPage = () => <div>إدارة المستخدمين</div>;
-const SettingsAdminPage = () => <div>إعدادات النظام</div>;
+import DashboardPage from './pages/DashboardPage';
+import ProductsAdminPage from './pages/ProductsAdminPage';
+import CategoriesAdminPage from './pages/CategoriesAdminPage';
+import OrdersAdminPage from './pages/OrdersAdminPage';
+import UsersAdminPage from './pages/UsersAdminPage';
+import SettingsAdminPage from './pages/SettingsAdminPage';
 
 export const adminRoutes = [
   { path: "/admin", element: <DashboardPage /> },

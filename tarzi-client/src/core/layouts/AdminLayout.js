@@ -1,9 +1,8 @@
 // src/core/layouts/AdminLayout.js
 import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
-  CssBaseline,
   Drawer,
   AppBar,
   Toolbar,
@@ -14,143 +13,221 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  useTheme,
   Avatar,
   Menu,
   MenuItem,
+  Tooltip,
+  Badge,
   Container,
+  ListItemButton,
+  Collapse
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Dashboard,
-  Inventory,
-  Category,
-  ShoppingCart,
-  People,
-  Settings,
-  Logout,
-  ChevronLeft,
-  AccountCircle,
+  ChevronRight as ChevronRightIcon,
+  ChevronLeft as ChevronLeftIcon,
+  Dashboard as DashboardIcon,
+  Inventory as ProductsIcon,
+  Category as CategoryIcon,
+  ShoppingCart as OrdersIcon,
+  People as UsersIcon,
+  Settings as SettingsIcon,
+  Notifications as NotificationsIcon,
+  Person as PersonIcon,
+  ExitToApp as LogoutIcon,
+  ExpandLess,
+  ExpandMore,
+  Assignment as ReportsIcon,
+  Backup as BackupIcon,
+  Error as ErrorLogIcon
 } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
+import { useNotifications } from '../hooks/useNotifications';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const AdminLayout = () => {
+  const theme = useTheme();
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [open, setOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState({
+    reports: false,
+    system: false
+  });
   const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
   
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
   
-  const handleMenu = (event) => {
+  const handleMenuClick = (menu) => {
+    setMenuOpen(prev => ({
+      ...prev,
+      [menu]: !prev[menu]
+    }));
+  };
+  
+  const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
   
-  const handleClose = () => {
+  const handleNotificationMenuOpen = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+  
+  const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
   
-  const handleLogout = () => {
-    handleClose();
-    logout();
+  const handleNotificationMenuClose = () => {
+    setNotificationAnchorEl(null);
   };
   
   const handleNavigate = (path) => {
     navigate(path);
+    handleProfileMenuClose();
+    handleNotificationMenuClose();
+  };
+  
+  const handleLogout = () => {
+    handleProfileMenuClose();
+    logout();
+    navigate('/login');
+  };
+  
+  // التحقق مما إذا كان الرابط نشطًا
+  const isLinkActive = (path) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
   
   const menuItems = [
-    { text: 'لوحة التحكم', icon: <Dashboard />, path: '/admin' },
-    { text: 'المنتجات', icon: <Inventory />, path: '/admin/products' },
-    { text: 'الفئات', icon: <Category />, path: '/admin/categories' },
-    { text: 'الطلبات', icon: <ShoppingCart />, path: '/admin/orders' },
-    { text: 'المستخدمين', icon: <People />, path: '/admin/users' },
-    { text: 'الإعدادات', icon: <Settings />, path: '/admin/settings' },
+    { text: 'لوحة التحكم', icon: <DashboardIcon />, path: '/admin' },
+    { text: 'المنتجات', icon: <ProductsIcon />, path: '/admin/products' },
+    { text: 'الفئات', icon: <CategoryIcon />, path: '/admin/categories' },
+    { text: 'الطلبات', icon: <OrdersIcon />, path: '/admin/orders' },
+    { text: 'المستخدمين', icon: <UsersIcon />, path: '/admin/users' },
+    { text: 'الإعدادات', icon: <SettingsIcon />, path: '/admin/settings' }
   ];
   
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
+    <Box sx={{ display: 'flex', direction: 'rtl' }}>
       <AppBar
         position="fixed"
         sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          transition: (theme) => theme.transitions.create(['width', 'margin'], {
+          width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
+          mr: open ? `${drawerWidth}px` : 0,
+          transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
-          }),
-          ...(open && {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginRight: drawerWidth,
-            transition: (theme) => theme.transitions.create(['width', 'margin'], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
           }),
         }}
       >
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="فتح/إغلاق القائمة"
+            aria-label="فتح القائمة"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ ml: 2 }}
+            sx={{ mr: 2 }}
           >
-            {open ? <ChevronLeft /> : <MenuIcon />}
+            <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            لوحة تحكم تارزي
+            لوحة إدارة تارزي
           </Typography>
-          <div>
+          
+          {/* أيقونة الإشعارات */}
+          <Tooltip title="الإشعارات">
             <IconButton
-              size="large"
-              aria-label="حساب المستخدم الحالي"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
               color="inherit"
+              onClick={handleNotificationMenuOpen}
+              sx={{ mr: 1 }}
             >
-              {user?.imageUrl ? (
-                <Avatar alt={user.username} src={user.imageUrl} />
-              ) : (
-                <AccountCircle />
-              )}
+              <Badge badgeContent={unreadCount} color="error">
+                <NotificationsIcon />
+              </Badge>
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
+          </Tooltip>
+          
+          {/* أيقونة الملف الشخصي */}
+          <Tooltip title="الملف الشخصي">
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{ p: 0 }}
             >
-              <MenuItem onClick={() => { handleClose(); navigate('/profile'); }}>
-                الملف الشخصي
-              </MenuItem>
-              <MenuItem onClick={() => { handleClose(); navigate('/'); }}>
-                العودة للموقع
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>تسجيل الخروج</MenuItem>
-            </Menu>
-          </div>
+              <Avatar
+                alt={user?.username}
+                src={user?.imageUrl}
+                sx={{ width: 32, height: 32 }}
+              />
+            </IconButton>
+          </Tooltip>
+          
+          {/* قائمة الملف الشخصي */}
+          <Menu
+            anchorEl={anchorEl}
+            id="profile-menu"
+            open={Boolean(anchorEl)}
+            onClose={handleProfileMenuClose}
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+          >
+            <MenuItem onClick={() => handleNavigate('/profile')}>
+              <ListItemIcon>
+                <PersonIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="الملف الشخصي" />
+            </MenuItem>
+            <MenuItem onClick={() => handleNavigate('/')}>
+              <ListItemIcon>
+                <ChevronRightIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="العودة للموقع" />
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="تسجيل الخروج" />
+            </MenuItem>
+          </Menu>
+          
+          {/* قائمة الإشعارات */}
+          <Menu
+            anchorEl={notificationAnchorEl}
+            id="notification-menu"
+            open={Boolean(notificationAnchorEl)}
+            onClose={handleNotificationMenuClose}
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            PaperProps={{
+              style: {
+                width: 320,
+                maxHeight: 400,
+              },
+            }}
+          >
+            <MenuItem
+              onClick={() => handleNavigate('/admin/notifications')}
+              sx={{ justifyContent: 'center' }}
+            >
+              <Typography variant="subtitle2" color="primary">
+                عرض جميع الإشعارات
+              </Typography>
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
+      
+      {/* القائمة الجانبية */}
       <Drawer
-        variant="persistent"
-        anchor="right"
-        open={open}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
@@ -159,97 +236,148 @@ const AdminLayout = () => {
             boxSizing: 'border-box',
           },
         }}
+        variant="persistent"
+        anchor="right"
+        open={open}
       >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto', p: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              mb: 3,
-            }}
-          >
-            <Avatar
-              alt={user?.username || 'مدير النظام'}
-              src={user?.imageUrl}
-              sx={{ width: 80, height: 80, mb: 1 }}
-            />
-            <Typography variant="h6">{user?.username || 'مدير النظام'}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {user?.email}
-            </Typography>
-          </Box>
-          
-          <Divider sx={{ mb: 2 }} />
-          
-          <List>
-            {menuItems.map((item) => (
-              <ListItem
-                button
-                key={item.text}
-                onClick={() => handleNavigate(item.path)}
-                sx={{
-                  borderRadius: 1,
-                  mb: 1,
-                  '&:hover': {
-                    bgcolor: 'primary.light',
-                    color: 'white',
-                    '& .MuiListItemIcon-root': {
-                      color: 'white',
-                    },
-                  },
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <ListItem
-              button
-              onClick={handleLogout}
+        <Box sx={{ display: 'flex', alignItems: 'center', padding: theme.spacing(2) }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, color: 'primary.main', fontWeight: 'bold' }}>
+            لوحة التحكم
+          </Typography>
+          <IconButton onClick={handleDrawerToggle}>
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
+        
+        <Divider />
+        
+        <List>
+          {menuItems.map((item) => (
+            <ListItemButton
+              key={item.text}
+              onClick={() => handleNavigate(item.path)}
+              selected={isLinkActive(item.path)}
               sx={{
-                borderRadius: 1,
-                mb: 1,
-                color: 'error.main',
-                '&:hover': {
-                  bgcolor: 'error.main',
-                  color: 'white',
+                '&.Mui-selected': {
+                  bgcolor: 'primary.light',
+                  color: 'common.white',
+                  '&:hover': {
+                    bgcolor: 'primary.main',
+                  },
                   '& .MuiListItemIcon-root': {
-                    color: 'white',
+                    color: 'common.white',
                   },
                 },
               }}
             >
-              <ListItemIcon sx={{ color: 'error.main' }}>
-                <Logout />
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isLinkActive(item.path) ? 'common.white' : 'inherit',
+                }}
+              >
+                {item.icon}
               </ListItemIcon>
-              <ListItemText primary="تسجيل الخروج" />
-            </ListItem>
-          </List>
-        </Box>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          ))}
+          
+          {/* قائمة التقارير */}
+          <ListItemButton onClick={() => handleMenuClick('reports')}>
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              <ReportsIcon />
+            </ListItemIcon>
+            <ListItemText primary="التقارير" />
+            {menuOpen.reports ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          
+          <Collapse in={menuOpen.reports} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                sx={{ pr: 4 }}
+                onClick={() => handleNavigate('/admin/reports/sales')}
+                selected={isLinkActive('/admin/reports/sales')}
+              >
+                <ListItemText primary="تقارير المبيعات" />
+              </ListItemButton>
+              
+              <ListItemButton
+                sx={{ pr: 4 }}
+                onClick={() => handleNavigate('/admin/reports/products')}
+                selected={isLinkActive('/admin/reports/products')}
+              >
+                <ListItemText primary="تقارير المنتجات" />
+              </ListItemButton>
+              
+              <ListItemButton
+                sx={{ pr: 4 }}
+                onClick={() => handleNavigate('/admin/reports/users')}
+                selected={isLinkActive('/admin/reports/users')}
+              >
+                <ListItemText primary="تقارير المستخدمين" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+          
+          {/* قائمة النظام */}
+          <ListItemButton onClick={() => handleMenuClick('system')}>
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="النظام" />
+            {menuOpen.system ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          
+          <Collapse in={menuOpen.system} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton
+                sx={{ pr: 4 }}
+                onClick={() => handleNavigate('/admin/backups')}
+                selected={isLinkActive('/admin/backups')}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <BackupIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="النسخ الاحتياطية" />
+              </ListItemButton>
+              
+              <ListItemButton
+                sx={{ pr: 4 }}
+                onClick={() => handleNavigate('/admin/logs')}
+                selected={isLinkActive('/admin/logs')}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <ErrorLogIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="السجلات" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+        </List>
       </Drawer>
+      
+      {/* المحتوى الرئيسي */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${open ? drawerWidth : 0}px)` },
-          ml: { sm: open ? `${drawerWidth}px` : 0 },
-          transition: (theme) =>
-            theme.transitions.create(['width', 'margin'], {
-              easing: theme.transitions.easing.sharp,
+          mt: 8,
+          transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+          marginRight: `-${drawerWidth}px`,
+          ...(open && {
+            transition: theme.transitions.create('margin', {
+              easing: theme.transitions.easing.easeOut,
               duration: theme.transitions.duration.enteringScreen,
             }),
+            marginRight: 0,
+          }),
         }}
       >
-        <Toolbar />
-        <Container maxWidth="lg">
-          <Outlet />
-        </Container>
+        <Outlet />
       </Box>
     </Box>
   );

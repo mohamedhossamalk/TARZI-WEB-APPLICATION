@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.js (corregir importaciones)
 import React, { Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
@@ -27,15 +27,15 @@ import LoadingScreen from './common/components/LoadingScreen';
 import ErrorBoundary from './common/components/ErrorBoundary';
 
 // مسارات التطبيق
-import { authRoutes } from './features/auth/auth.routes';
-import { productRoutes } from './features/products/products.routes';
-import { cartRoutes } from './features/cart/cart.routes';
-import { orderRoutes } from './features/orders/orders.routes';
-import { measurementRoutes } from './features/measurements/measurements.routes';
-import { serviceRoutes } from './features/services/services.routes';
-import { notificationRoutes } from './features/notifications/notifications.routes';
-import { profileRoutes } from './features/profile/profile.routes';
-import { adminRoutes } from './features/admin/admin.routes';
+import authRoutes from './features/auth/auth.routes';
+import productRoutes from './features/products/products.routes'; 
+import cartRoutes from './features/cart/cart.routes';
+import orderRoutes from './features/orders/orders.routes';
+import measurementRoutes from './features/measurements/measurements.routes';
+import serviceRoutes from './features/services/services.routes';
+import notificationRoutes from './features/notifications/notifications.routes';
+import profileRoutes from './features/profile/profile.routes';
+import adminRoutes from './features/admin/admin.routes';
 
 // صفحات عامة
 const HomePage = React.lazy(() => import('./features/products/pages/HomePage'));
@@ -46,6 +46,12 @@ const cacheRtl = createCache({
   key: 'muirtl',
   stylisPlugins: [prefixer, rtlPlugin],
 });
+
+// تهيئة بنية المسارات الافتراضية
+const defaultRouteStructure = {
+  public: [],
+  protected: []
+};
 
 const App = () => {
   const { isAuthenticated, isAdmin, isProfessional, loading, checkAuthStatus } = useAuth();
@@ -62,6 +68,10 @@ const App = () => {
       initializeNotifications();
     }
   }, [isAuthenticated, initializeNotifications]);
+
+  // التأكد من وجود بنية المسارات الصحيحة
+  const safeProductRoutes = productRoutes || defaultRouteStructure;
+  const safeServiceRoutes = serviceRoutes || defaultRouteStructure;
 
   // عرض شاشة التحميل أثناء التحقق من حالة المصادقة
   if (loading) {
@@ -89,7 +99,7 @@ const App = () => {
             <Routes>
               {/* مسارات المصادقة */}
               <Route element={<AuthLayout />}>
-                {authRoutes.map((route) => (
+                {authRoutes && authRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
               </Route>
@@ -104,7 +114,7 @@ const App = () => {
                   )
                 }
               >
-                {adminRoutes.map((route) => (
+                {adminRoutes && adminRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
               </Route>
@@ -114,12 +124,12 @@ const App = () => {
                 <Route path="/" element={<HomePage />} />
                 
                 {/* مسارات المنتجات العامة */}
-                {productRoutes.public.map((route) => (
+                {safeProductRoutes.public && safeProductRoutes.public.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات الخدمات العامة */}
-                {serviceRoutes.public.map((route) => (
+                {safeServiceRoutes.public && safeServiceRoutes.public.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
@@ -137,32 +147,32 @@ const App = () => {
                 }
               >
                 {/* مسارات المنتجات المحمية */}
-                {productRoutes.protected.map((route) => (
+                {safeProductRoutes.protected && safeProductRoutes.protected.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات سلة التسوق */}
-                {cartRoutes.map((route) => (
+                {cartRoutes && cartRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات الطلبات */}
-                {orderRoutes.map((route) => (
+                {orderRoutes && orderRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات المقاسات */}
-                {measurementRoutes.map((route) => (
+                {measurementRoutes && measurementRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات الإشعارات */}
-                {notificationRoutes.map((route) => (
+                {notificationRoutes && notificationRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
                 
                 {/* مسارات الملف الشخصي */}
-                {profileRoutes.map((route) => (
+                {profileRoutes && profileRoutes.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
               </Route>
@@ -177,7 +187,7 @@ const App = () => {
                   )
                 }
               >
-                {serviceRoutes.professional.map((route) => (
+                {safeServiceRoutes.professional && safeServiceRoutes.professional.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
               </Route>

@@ -1,9 +1,9 @@
-// src/features/measurements/routes.js
-import React from 'react';
+// قم بإنشاء ملف جديد في المسار:
+// src/features/measurements/measurements.routes.js
 
-// استيراد مكونات الصفحات مؤقتاً
-const MeasurementsPage = () => <div>صفحة المقاسات</div>;
-const AddMeasurementPage = () => <div>صفحة إضافة مقاس</div>;
+import React from 'react';
+import MeasurementsPage from './pages/MeasurementsPage';
+import AddMeasurementPage from './pages/AddMeasurementPage';
 
 export const measurementRoutes = [
   { path: "/measurements", element: <MeasurementsPage /> },

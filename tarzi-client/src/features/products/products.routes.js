@@ -1,17 +1,22 @@
 // src/features/products/routes.js
 import React from 'react';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import HomePage from './pages/HomePage';
+// سنقوم لاحقًا بإنشاء صفحة المفضلة
 
-// استيراد مكونات الصفحات مؤقتاً
-const ProductsPage = () => <div>صفحة المنتجات</div>;
-const ProductDetailPage = () => <div>صفحة تفاصيل المنتج</div>;
-const HomePage = () => <div>الصفحة الرئيسية</div>;
-
-export const productRoutes = {
+// تقسيم المسارات إلى عامة ومحمية
+const productRoutes = {
+  // المسارات العامة (لا تتطلب تسجيل دخول)
   public: [
     { path: "/products", element: <ProductsPage /> },
-    { path: "/products/:id", element: <ProductDetailPage /> },
+    { path: "/products/:id", element: <ProductDetailPage /> }
   ],
-  protected: []
+  
+  // المسارات المحمية (تتطلب تسجيل دخول)
+  protected: [
+    // سنضيف مسار المفضلة لاحقًا
+  ]
 };
 
 export default productRoutes;

@@ -1,11 +1,11 @@
 // src/features/cart/routes.js
 import React from 'react';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 
-// استيراد مكونات الصفحات مؤقتاً
-const CartPage = () => <div>صفحة سلة التسوق</div>;
-
-export const cartRoutes = [
+const cartRoutes = [
   { path: "/cart", element: <CartPage /> },
+  { path: "/checkout", element: <CheckoutPage /> }
 ];
 
 export default cartRoutes;
