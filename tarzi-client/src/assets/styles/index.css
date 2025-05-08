@@ -1,0 +1,182 @@
+/* src/assets/styles/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* أنماط عامة */
+.app-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 3px solid #3498db;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* تخصيص ImageGallery */
+.image-gallery-slide img {
+  height: 450px;
+  object-fit: contain;
+}
+
+.image-gallery-thumbnail img {
+  height: 80px;
+  object-fit: cover;
+}
+/* src/assets/styles/index.css (تكملة) */
+@media (max-width: 600px) {
+  .image-gallery-slide img {
+    height: 300px;
+  }
+  
+  .image-gallery-thumbnail img {
+    height: 60px;
+  }
+}
+
+/* تنسيق التقييمات */
+.reviews-container {
+  margin-top: 20px;
+}
+
+.review-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-user {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* تنسيق الأزرار */
+.action-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* تنسيق زر تبديل المفضلة */
+.favorite-button.active {
+  color: #e91e63;
+}
+
+/* تنسيق الجدول */
+.table-container {
+  overflow-x: auto;
+}
+
+.bg-highlight {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* تنسيق التنقل */
+.breadcrumbs-container {
+  margin-bottom: 20px;
+}
+
+/* تنسيق رسائل الخطأ والتنبيه */
+.alert-message {
+  margin-bottom: 15px;
+}
+
+/* تنسيق للشاشات المتوسطة والكبيرة */
+@media (min-width: 960px) {
+  .sidebar {
+    position: sticky;
+    top: 20px;
+  }
+}
+
+/* تنسيق النماذج */
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-section {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+/* تنسيق لوحة التحكم */
+.dashboard-card {
+  position: relative;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-title {
+  color: #777;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.stat-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 2.5rem;
+  opacity: 0.2;
+}

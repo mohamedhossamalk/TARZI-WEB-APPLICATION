@@ -1,0 +1,87 @@
+/* src/assets/styles/variables.css */
+:root {
+  /* الألوان الأساسية */
+  --primary-color: #3498db;
+  --primary-light: #5dade2;
+  --primary-dark: #2874a6;
+  
+  --secondary-color: #2ecc71;
+  --secondary-light: #58d68d;
+  --secondary-dark: #27ae60;
+  
+  /* ألوان الحالة */
+  --success-color: #2ecc71;
+  --error-color: #e74c3c;
+  --warning-color: #f39c12;
+  --info-color: #3498db;
+  
+  /* ألوان النص */
+  --text-primary: #333333;
+  --text-secondary: #6c6c6c;
+  --text-disabled: #9e9e9e;
+  
+  /* ألوان الخلفية */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-disabled: #e0e0e0;
+  
+  /* الظلال */
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  --shadow-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  --shadow-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  --shadow-5: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+  
+  /* الزوايا */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 20px;
+  
+  /* الخطوط */
+  --font-family: 'Cairo', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  
+  /* المسافات */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* العناصر */
+  --header-height: 64px;
+  --sidebar-width: 240px;
+  --footer-height: 60px;
+  
+  /* التحولات */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* تخصيص للوضع الداكن (يمكن إضافته لاحقًا) */
+[data-theme="dark"] {
+  --primary-color: #4dabf5;
+  --primary-light: #6fc0ff;
+  --primary-dark: #2979c2;
+  
+  --secondary-color: #66bb6a;
+  --secondary-light: #98ee99;
+  --secondary-dark: #338a3e;
+  
+  --text-primary: #f5f5f5;
+  --text-secondary: #b0b0b0;
+  --text-disabled: #6c6c6c;
+  
+  --bg-primary: #222222;
+  --bg-secondary: #333333;
+  --bg-disabled: #444444;
+}
