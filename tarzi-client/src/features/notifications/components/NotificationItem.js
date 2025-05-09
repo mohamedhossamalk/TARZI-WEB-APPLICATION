@@ -6,149 +6,212 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
-  IconButton,
   Typography,
   Box,
-  Tooltip,
-  Badge,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Tooltip
 } from '@mui/material';
 import {
+  ShoppingBag as OrderIcon,
+  Message as MessageIcon,
+  LocalOffer as OfferIcon,
+  Info as InfoIcon,
+  MoreVert as MoreVertIcon,
   Delete as DeleteIcon,
   DoneAll as DoneAllIcon,
-  Circle as CircleIcon,
-  LocalShipping as ShippingIcon,
-  Payment as PaymentIcon,
-  Person as PersonIcon,
-  Settings as SettingsIcon,
-  Info as InfoIcon,
+  NotificationsActive as NotificationIcon
 } from '@mui/icons-material';
-import { formatRelativeTime } from '../../../core/utils/formatters';
-import { useTranslation } from 'react-i18next';
+import { formatDistance } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { useNotifications } from '../../../core/hooks/useNotifications';
 
-const NotificationItem = ({ notification, onMarkAsRead, onDelete }) => {
-  const { t } = useTranslation();
+const NotificationItem = ({ notification }) => {
   const navigate = useNavigate();
+  const { markAsRead, deleteNotification } = useNotifications();
   
-  // اختيار الأيقونة المناسبة حسب نوع الإشعار
-  const getIcon = (type) => {
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
+  
+  // تعيين أيقونة الإشعار حسب النوع
+  const getNotificationIcon = (type) => {
     switch (type) {
       case 'order':
-        return <ShippingIcon />;
-      case 'payment':
-        return <PaymentIcon />;
-      case 'account':
-        return <PersonIcon />;
+        return <OrderIcon />;
+      case 'message':
+        return <MessageIcon />;
+      case 'offer':
+        return <OfferIcon />;
       case 'system':
-        return <SettingsIcon />;
-      default:
         return <InfoIcon />;
+      default:
+        return <NotificationIcon />;
     }
   };
   
-  // اختيار لون الأيقونة حسب نوع الإشعار
-  const getIconBgColor = (type) => {
+  // تعيين لون الإشعار حسب النوع
+  const getNotificationColor = (type) => {
     switch (type) {
       case 'order':
         return 'primary.main';
-      case 'payment':
-        return 'success.main';
-      case 'account':
+      case 'message':
         return 'info.main';
+      case 'offer':
+        return 'secondary.main';
       case 'system':
         return 'warning.main';
       default:
-        return 'grey.500';
+        return 'primary.main';
     }
   };
   
-  // التنقل عند النقر على الإشعار
+  // توجيه المستخدم إلى الصفحة المناسبة عند النقر على الإشعار
   const handleClick = () => {
-    // إذا كان الإشعار غير مقروء، ضع عليه علامة مقروء
-    if (!notification.isRead) {
-      onMarkAsRead();
+    // إذا كان الإشعار غير مقروء، يتم تعيينه كمقروء
+    if (!notification.read) {
+      markAsRead(notification._id);
     }
     
-    // التنقل بناءً على نوع الإشعار ورابطه
-    if (notification.link) {
+    // توجيه المستخدم حسب نوع الإشعار
+    if (notification.type === 'order' && notification.data?.orderId) {
+      navigate(`/orders/${notification.data.orderId}`);
+    } else if (notification.type === 'message' && notification.data?.conversationId) {
+      navigate(`/messages/${notification.data.conversationId}`);
+    } else if (notification.type === 'offer' && notification.data?.offerId) {
+      navigate(`/offers/${notification.data.offerId}`);
+    } else if (notification.link) {
       navigate(notification.link);
     }
   };
   
+  // فتح قائمة الخيارات
+  const handleOpenMenu = (event) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+  };
+  
+  // إغلاق قائمة الخيارات
+  const handleCloseMenu = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    setMenuAnchorEl(null);
+  };
+  
+  // تعيين الإشعار كمقروء
+  const handleMarkAsRead = (event) => {
+    event.stopPropagation();
+    markAsRead(notification._id);
+    handleCloseMenu();
+  };
+  
+  // حذف الإشعار
+  const handleDelete = (event) => {
+    event.stopPropagation();
+    deleteNotification(notification._id);
+    handleCloseMenu();
+  };
+  
+  // تنسيق الوقت منذ إنشاء الإشعار
+  const formattedTime = formatDistance(
+    new Date(notification.createdAt),
+    new Date(),
+    { addSuffix: true, locale: ar }
+  );
+
   return (
     <ListItem
       alignItems="flex-start"
       sx={{
-        bgcolor: notification.isRead ? 'inherit' : 'action.hover',
+        borderRadius: 1,
+        mb: 1,
         cursor: 'pointer',
-        '&:hover': { bgcolor: 'action.selected' }
+        transition: 'background-color 0.2s',
+        backgroundColor: notification.read ? 'transparent' : 'action.hover',
+        '&:hover': {
+          backgroundColor: 'action.selected'
+        }
       }}
       onClick={handleClick}
-      secondaryAction={
-        <Box>
-          {!notification.isRead && (
-            <Tooltip title={t('notifications.markAsRead')}>
-              <IconButton edge="end" color="primary" onClick={(e) => {
-                e.stopPropagation();
-                onMarkAsRead();
-              }}>
-                <DoneAllIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Tooltip title={t('general.delete')}>
-            <IconButton edge="end" color="error" onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      }
     >
       <ListItemAvatar>
-        <Badge
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          badgeContent={
-            !notification.isRead && 
-            <CircleIcon sx={{ fontSize: 10, color: 'error.main' }} />
-          }
-        >
-          <Avatar sx={{ bgcolor: getIconBgColor(notification.type) }}>
-            {getIcon(notification.type)}
-          </Avatar>
-        </Badge>
+        <Avatar sx={{ bgcolor: getNotificationColor(notification.type) }}>
+          {getNotificationIcon(notification.type)}
+        </Avatar>
       </ListItemAvatar>
+      
       <ListItemText
         primary={
-          <Typography
-            variant="subtitle1"
-            fontWeight={notification.isRead ? 'normal' : 'bold'}
-          >
-            {notification.title}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <Typography
+              variant="subtitle1"
+              component="span"
+              fontWeight={notification.read ? 'normal' : 'bold'}
+            >
+              {notification.title}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              component="span"
+            >
+              {formattedTime}
+            </Typography>
+          </Box>
         }
         secondary={
           <React.Fragment>
             <Typography
-              component="span"
               variant="body2"
               color="text.primary"
-              sx={{ display: 'block', mb: 0.5 }}
-            >
-              {notification.message}
-            </Typography>
-            <Typography
               component="span"
-              variant="caption"
-              color="text.secondary"
+              sx={{
+                display: 'inline',
+                opacity: notification.read ? 0.8 : 1
+              }}
             >
-              {formatRelativeTime(notification.createdAt)}
+              {notification.body}
             </Typography>
           </React.Fragment>
         }
       />
+      
+      <Box>
+        <Tooltip title="خيارات">
+          <IconButton
+            edge="end"
+            aria-label="خيارات"
+            onClick={handleOpenMenu}
+            size="small"
+          >
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        
+        <Menu
+          anchorEl={menuAnchorEl}
+          open={Boolean(menuAnchorEl)}
+          onClose={handleCloseMenu}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {!notification.read && (
+            <MenuItem onClick={handleMarkAsRead}>
+              <ListItemIcon>
+                <DoneAllIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="تعيين كمقروء" />
+            </MenuItem>
+          )}
+          
+          <MenuItem onClick={handleDelete}>
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText primary="حذف" />
+          </MenuItem>
+        </Menu>
+      </Box>
     </ListItem>
   );
 };

@@ -1,5 +1,5 @@
-// src/App.js (corregir importaciones)
-import React, { Suspense, useEffect } from 'react';
+// src/App.js
+import React, { Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -24,12 +24,13 @@ import theme from './config/theme';
 
 // المكونات
 import LoadingScreen from './common/components/LoadingScreen';
+import AdvancedLoadingScreen from './common/components/AdvancedLoadingScreen';
 import ErrorBoundary from './common/components/ErrorBoundary';
 
-// مسارات التطبيق
+// مسارات التطبيق - تصحيح الاستيرادات
 import authRoutes from './features/auth/auth.routes';
 import productRoutes from './features/products/products.routes'; 
-import cartRoutes from './features/cart/cart.routes';
+import cartRoutes from './features/cart/cart.routes'; 
 import orderRoutes from './features/orders/orders.routes';
 import measurementRoutes from './features/measurements/measurements.routes';
 import serviceRoutes from './features/services/services.routes';
@@ -54,12 +55,20 @@ const defaultRouteStructure = {
 };
 
 const App = () => {
-  const { isAuthenticated, isAdmin, isProfessional, loading, checkAuthStatus } = useAuth();
+  const { isAuthenticated, isAdmin, isProfessional, loading: authLoading, checkAuthStatus } = useAuth();
   const { initializeNotifications } = useNotifications();
+  const [appLoading, setAppLoading] = useState(true);
 
   // التحقق من حالة المصادقة عند تحميل التطبيق
   useEffect(() => {
     checkAuthStatus();
+    
+    // محاكاة تحميل موارد التطبيق
+    const timer = setTimeout(() => {
+      setAppLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
   }, [checkAuthStatus]);
 
   // تهيئة الإشعارات عند تسجيل الدخول
@@ -69,13 +78,34 @@ const App = () => {
     }
   }, [isAuthenticated, initializeNotifications]);
 
+  // معالجة الحالات الخاصة للمسارات
+  const getSafeRoutes = (routeModule) => {
+    if (!routeModule) return defaultRouteStructure;
+    
+    // تحقق إذا كان المسار عبارة عن مصفوفة مسطحة
+    if (Array.isArray(routeModule)) {
+      return {
+        public: [],
+        protected: routeModule
+      };
+    }
+    
+    // إذا كان المسار يتبع البنية المتوقعة (public/protected)
+    return routeModule;
+  };
+
   // التأكد من وجود بنية المسارات الصحيحة
-  const safeProductRoutes = productRoutes || defaultRouteStructure;
-  const safeServiceRoutes = serviceRoutes || defaultRouteStructure;
+  const safeProductRoutes = getSafeRoutes(productRoutes);
+  const safeServiceRoutes = getSafeRoutes(serviceRoutes);
+
+  // عرض شاشة التحميل المتقدمة عند بدء التطبيق
+  if (appLoading) {
+    return <AdvancedLoadingScreen duration={2000} />;
+  }
 
   // عرض شاشة التحميل أثناء التحقق من حالة المصادقة
-  if (loading) {
-    return <LoadingScreen />;
+  if (authLoading) {
+    return <LoadingScreen message="جاري التحقق من حساب المستخدم..." />;
   }
 
   return (
@@ -110,7 +140,7 @@ const App = () => {
                   isAuthenticated && isAdmin ? (
                     <AdminLayout />
                   ) : (
-                    <Navigate to="/login" replace />
+                    <Navigate to="/login" state={{ from: '/admin' }} replace />
                   )
                 }
               >
@@ -183,7 +213,7 @@ const App = () => {
                   isAuthenticated && isProfessional ? (
                     <MainLayout />
                   ) : (
-                    <Navigate to="/login" replace />
+                    <Navigate to="/login" state={{ from: window.location.pathname }} replace />
                   )
                 }
               >

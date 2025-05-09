@@ -1,11 +1,11 @@
 // src/features/notifications/routes.js
 import React from 'react';
+import NotificationsPage from './pages/NotificationsPage';
+import NotificationSettingsPage from './pages/NotificationSettingsPage';
 
-// استيراد مكونات الصفحات مؤقتاً
-const NotificationsPage = () => <div>صفحة الإشعارات</div>;
-
-export const notificationRoutes = [
+const notificationRoutes = [
   { path: "/notifications", element: <NotificationsPage /> },
+  { path: "/notifications/settings", element: <NotificationSettingsPage /> }
 ];
 
 export default notificationRoutes;

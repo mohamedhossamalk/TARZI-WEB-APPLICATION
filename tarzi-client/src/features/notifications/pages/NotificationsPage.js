@@ -1,295 +1,292 @@
 // src/features/notifications/pages/NotificationsPage.js
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Link as RouterLink } from 'react-router-dom';
 import {
-  Box,
   Container,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  Badge,
-  IconButton,
+  Box,
+  Paper,
   Divider,
   Button,
-  Paper,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
   Tabs,
   Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Tooltip,
+  Breadcrumbs,
+  Link,
   CircularProgress,
   Alert,
+  Badge
 } from '@mui/material';
 import {
-  Notifications as NotificationsIcon,
-  Delete as DeleteIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  Info as InfoIcon,
-  LocalShipping as ShippingIcon,
-  Payment as PaymentIcon,
-  Person as PersonIcon,
+  Home as HomeIcon,
+  KeyboardArrowLeft as KeyboardArrowLeftIcon,
+  MoreVert as MoreVertIcon,
   Settings as SettingsIcon,
-  MarkEmailRead as MarkEmailReadIcon,
+  DeleteOutline as DeleteIcon,
+  DoneAll as DoneAllIcon,
+  FilterList as FilterListIcon,
+  NotificationsActive as NotificationsActiveIcon,
+  NotificationsOff as NotificationsOffIcon
 } from '@mui/icons-material';
 import { useNotifications } from '../../../core/hooks/useNotifications';
-import { formatRelativeTime } from '../../../core/utils/formatters';
-import NotificationItem from '../components/NotificationItem';
+import notificationService from '../services/notificationService';
+import NotificationsList from '../components/NotificationsList';
 
-// مكوّن لعرض رمز مناسب حسب نوع الإشعار
-const NotificationIcon = ({ type }) => {
-  const iconProps = { fontSize: 'small' };
-  
-  switch (type) {
-    case 'order':
-      return <ShippingIcon {...iconProps} />;
-    case 'payment':
-      return <PaymentIcon {...iconProps} />;
-    case 'account':
-      return <PersonIcon {...iconProps} />;
-    case 'system':
-      return <SettingsIcon {...iconProps} />;
-    default:
-      return <InfoIcon {...iconProps} />;
-  }
-};
-
-const NotificationsPage = () => {
-  const { t } = useTranslation();
-  const {
-    notifications,
-    fetchAllNotifications,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    unreadCount,
-    loading,
-  } = useNotifications();
-  
-  const [allNotifications, setAllNotifications] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [activeTab, setActiveTab] = useState(0);
-  const [selectedNotification, setSelectedNotification] = useState(null);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  
-  // جلب جميع الإشعارات عند تحميل الصفحة
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-  
-  // دالة لجلب الإشعارات
-  const loadNotifications = async (page = 1) => {
-    try {
-      const result = await fetchAllNotifications(page);
-      if (page === 1) {
-        setAllNotifications(result.notifications);
-      } else {
-        setAllNotifications(prev => [...prev, ...result.notifications]);
-      }
-      setCurrentPage(result.pagination.page);
-      setTotalPages(result.pagination.pages);
-    } catch (error) {
-      console.error('خطأ في جلب الإشعارات:', error);
-    }
-  };
-  
-  // تحميل المزيد من الإشعارات
-  const handleLoadMore = async () => {
-    if (loadingMore || currentPage >= totalPages) return;
-    
-    setLoadingMore(true);
-    try {
-      await loadNotifications(currentPage + 1);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-  
-  // تغيير التبويب النشط
-  const handleChangeTab = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-  
-  // وضع علامة كمقروء لإشعار
-  const handleMarkAsRead = async (id) => {
-    await markAsRead(id);
-    // تحديث حالة الإشعار في القائمة
-    setAllNotifications(prev =>
-      prev.map(notification =>
-        notification._id === id ? { ...notification, isRead: true } : notification
-      )
-    );
-  };
-  
-  // وضع علامة كمقروء لجميع الإشعارات
-  const handleMarkAllAsRead = async () => {
-    await markAllAsRead();
-    // تحديث حالة جميع الإشعارات في القائمة
-    setAllNotifications(prev =>
-      prev.map(notification => ({ ...notification, isRead: true }))
-    );
-  };
-  
-  // فتح حوار حذف الإشعار
-  const handleOpenDeleteDialog = (notification) => {
-    setSelectedNotification(notification);
-    setOpenDeleteDialog(true);
-  };
-  
-  // إغلاق حوار حذف الإشعار
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-    setSelectedNotification(null);
-  };
-  
-  // حذف الإشعار
-  const handleDeleteNotification = async () => {
-    if (!selectedNotification) return;
-    
-    await deleteNotification(selectedNotification._id);
-    // إزالة الإشعار من القائمة
-    setAllNotifications(prev =>
-      prev.filter(notification => notification._id !== selectedNotification._id)
-    );
-    handleCloseDeleteDialog();
-  };
-  // تصفية الإشعارات حسب التبويب النشط
-  const filteredNotifications = allNotifications.filter(notification => {
-    if (activeTab === 0) return true; // الكل
-    if (activeTab === 1) return !notification.isRead; // غير مقروءة
-    if (activeTab === 2) return notification.isRead; // مقروءة
-    return true;
-  });
+// مكون TabPanel
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`notifications-tabpanel-${index}`}
+      aria-labelledby={`notifications-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+const NotificationsPage = () => {
+  const { notifications, unreadCount, loading, error, markAllAsRead, deleteAllNotifications } = useNotifications();
+  
+  const [tabValue, setTabValue] = useState(0);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [selectedType, setSelectedType] = useState('all');
+  const [filterMenuAnchorEl, setFilterMenuAnchorEl] = useState(null);
+  
+  const notificationTypes = [
+    { id: 'all', label: 'الكل' },
+    { id: 'order', label: 'الطلبات' },
+    { id: 'message', label: 'الرسائل' },
+    { id: 'system', label: 'النظام' },
+    { id: 'offer', label: 'العروض' }
+  ];
+
+  useEffect(() => {
+    // تحديث الإشعارات من الخدمة
+    notificationService.getNotifications();
+  }, []);
+
+  // تغيير التبويب
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  // فتح قائمة الخيارات
+  const handleOpenMenu = (event) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  // إغلاق قائمة الخيارات
+  const handleCloseMenu = () => {
+    setMenuAnchorEl(null);
+  };
+
+  // فتح قائمة الفلترة
+  const handleOpenFilterMenu = (event) => {
+    setFilterMenuAnchorEl(event.currentTarget);
+  };
+
+  // إغلاق قائمة الفلترة
+  const handleCloseFilterMenu = () => {
+    setFilterMenuAnchorEl(null);
+  };
+
+  // تعيين نوع الفلترة
+  const handleSetFilter = (type) => {
+    setSelectedType(type);
+    handleCloseFilterMenu();
+  };
+
+  // وضع علامة على جميع الإشعارات كمقروءة
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead();
+    handleCloseMenu();
+  };
+
+  // حذف جميع الإشعارات
+  const handleDeleteAll = async () => {
+    await deleteAllNotifications();
+    handleCloseMenu();
+  };
+
+  // فلترة الإشعارات حسب النوع ووضع القراءة
+  const getFilteredNotifications = () => {
+    let filtered = [...notifications];
+    
+    // فلترة حسب النوع
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(notification => notification.type === selectedType);
+    }
+    
+    // فلترة حسب وضع القراءة
+    if (tabValue === 1) {
+      filtered = filtered.filter(notification => notification.read);
+    } else if (tabValue === 2) {
+      filtered = filtered.filter(notification => !notification.read);
+    }
+    
+    return filtered;
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Breadcrumbs separator={<KeyboardArrowLeftIcon fontSize="small" />} aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          color="inherit"
+          component={RouterLink}
+          to="/"
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
+          <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+          الرئيسية
+        </Link>
+        <Typography color="text.primary">الإشعارات</Typography>
+      </Breadcrumbs>
+      
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          {t('notifications.notifications')}
+        <Typography variant="h4" component="h1" sx={{ display: 'flex', alignItems: 'center' }}>
+          <NotificationsActiveIcon color="primary" sx={{ mr: 1 }} />
+          الإشعارات
+          {unreadCount > 0 && (
+            <Badge
+              badgeContent={unreadCount}
+              color="error"
+              sx={{ ml: 1 }}
+            />
+          )}
         </Typography>
         
-        {unreadCount > 0 && (
-          <Button
-            variant="outlined"
-            color="primary"
-            startIcon={<MarkEmailReadIcon />}
-            onClick={handleMarkAllAsRead}
+        <Box>
+          <IconButton
+            onClick={handleOpenFilterMenu}
+            aria-label="تصفية"
+            size="small"
+            sx={{ mr: 1 }}
           >
-            {t('notifications.markAllAsRead')}
-          </Button>
-        )}
+            <FilterListIcon />
+          </IconButton>
+          
+          <IconButton
+            onClick={handleOpenMenu}
+            aria-label="المزيد من الخيارات"
+            size="small"
+          >
+            <MoreVertIcon />
+          </IconButton>
+        </Box>
       </Box>
       
-      <Paper sx={{ mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleChangeTab}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="fullWidth"
-        >
-          <Tab label={t('general.all')} />
-          <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {t('general.new')}
-                {unreadCount > 0 && (
-                  <Badge
-                    color="error"
-                    badgeContent={unreadCount}
-                    sx={{ mr: 1, ml: 1 }}
-                  />
-                )}
-              </Box>
-            }
-          />
-          <Tab label={t('general.read')} />
-        </Tabs>
+      <Paper sx={{ mb: 4 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            <Tab label="الكل" />
+            <Tab label="المقروءة" />
+            <Tab 
+              label={
+                <Badge badgeContent={unreadCount} color="error">
+                  غير المقروءة
+                </Badge>
+              } 
+            />
+          </Tabs>
+        </Box>
+        
+        {error && (
+          <Box sx={{ p: 3 }}>
+            <Alert severity="error">
+              {error}
+            </Alert>
+          </Box>
+        )}
+        
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <TabPanel value={tabValue} index={0}>
+              <NotificationsList notifications={getFilteredNotifications()} />
+            </TabPanel>
+            
+            <TabPanel value={tabValue} index={1}>
+              <NotificationsList notifications={getFilteredNotifications()} />
+            </TabPanel>
+            
+            <TabPanel value={tabValue} index={2}>
+              <NotificationsList notifications={getFilteredNotifications()} />
+            </TabPanel>
+          </>
+        )}
       </Paper>
       
-      {loading && currentPage === 1 ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : filteredNotifications.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <NotificationsIcon sx={{ fontSize: 60, color: 'text.secondary', opacity: 0.7, mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            {t('notifications.noNotifications')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {activeTab === 1
-              ? 'ليس لديك إشعارات جديدة غير مقروءة'
-              : activeTab === 2
-              ? 'ليس لديك إشعارات مقروءة'
-              : 'ليس لديك أي إشعارات'}
-          </Typography>
-        </Paper>
-      ) : (
-        <Paper>
-          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {filteredNotifications.map((notification, index) => (
-              <React.Fragment key={notification._id}>
-                <NotificationItem
-                  notification={notification}
-                  onMarkAsRead={() => handleMarkAsRead(notification._id)}
-                  onDelete={() => handleOpenDeleteDialog(notification)}
-                />
-                {index < filteredNotifications.length - 1 && <Divider component="li" />}
-              </React.Fragment>
-            ))}
-          </List>
-          
-          {currentPage < totalPages && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-              <Button
-                variant="text"
-                color="primary"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-              >
-                {loadingMore ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  t('general.showMore')
-                )}
-              </Button>
-            </Box>
-          )}
-        </Paper>
-      )}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Button
+          component={RouterLink}
+          to="/notifications/settings"
+          variant="outlined"
+          startIcon={<SettingsIcon />}
+        >
+          إعدادات الإشعارات
+        </Button>
+      </Box>
       
-      {/* حوار تأكيد حذف الإشعار */}
-      <Dialog
-        open={openDeleteDialog}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="delete-notification-dialog-title"
+      {/* قائمة الخيارات */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleCloseMenu}
       >
-        <DialogTitle id="delete-notification-dialog-title">
-          {t('general.delete')} {t('notifications.notifications')}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t('general.confirmDelete')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>
-            {t('general.cancel')}
-          </Button>
-          <Button onClick={handleDeleteNotification} color="error" autoFocus>
-            {t('general.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <MenuItem onClick={handleMarkAllAsRead}>
+          <ListItemIcon>
+            <DoneAllIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="تعيين الكل كمقروء" />
+        </MenuItem>
+        <MenuItem onClick={handleDeleteAll}>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText primary="حذف جميع الإشعارات" />
+        </MenuItem>
+        <MenuItem component={RouterLink} to="/notifications/settings">
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="إعدادات الإشعارات" />
+        </MenuItem>
+      </Menu>
+      
+      {/* قائمة الفلترة */}
+      <Menu
+        anchorEl={filterMenuAnchorEl}
+        open={Boolean(filterMenuAnchorEl)}
+        onClose={handleCloseFilterMenu}
+      >
+        {notificationTypes.map((type) => (
+          <MenuItem
+            key={type.id}
+            onClick={() => handleSetFilter(type.id)}
+            selected={selectedType === type.id}
+          >
+            {type.label}
+          </MenuItem>
+        ))}
+      </Menu>
     </Container>
   );
 };

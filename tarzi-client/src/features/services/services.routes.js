@@ -1,18 +1,21 @@
 // src/features/services/routes.js
 import React from 'react';
+import ServicesPage from './pages/ServicesPage';
+import ServiceDetailPage from './pages/ServiceDetailPage';
+import MyServicesPage from './pages/MyServicesPage';
+import AddServicePage from './pages/AddServicePage';
+import EditServicePage from './pages/EditServicePage';
 
-// استيراد مكونات الصفحات مؤقتاً
-const ServicesPage = () => <div>صفحة الخدمات</div>;
-const ServiceDetailPage = () => <div>صفحة تفاصيل الخدمة</div>;
-const MyServicesPage = () => <div>صفحة خدماتي</div>;
-
-export const serviceRoutes = {
+// الخدمات المتاحة للجميع والخاصة بالمحترفين
+const serviceRoutes = {
   public: [
     { path: "/services", element: <ServicesPage /> },
-    { path: "/services/:id", element: <ServiceDetailPage /> },
+    { path: "/services/:id", element: <ServiceDetailPage /> }
   ],
   professional: [
-    { path: "/my-services", element: <MyServicesPage /> },
+    { path: "/services/manage", element: <MyServicesPage /> },
+    { path: "/services/new", element: <AddServicePage /> },
+    { path: "/services/edit/:id", element: <EditServicePage /> }
   ]
 };
 
